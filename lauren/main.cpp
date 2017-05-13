@@ -8,205 +8,211 @@
 #include <windows.h> // SetConsoleCursorPosition(HANDLE,COORD)
 #include <conio.h>   // _getch()
 #include <iostream>
-#include <stringstream>
+#include <sstream>
 #include <time.h>
 #include <stdlib.h>
 
 
 
 /**
- * moves the console cursor to the given x/y coordinate
- * 0, 0 is the upper-left hand coordinate. Standard consoles are 80x24.
- * @param x
- * @param y
- */
+* moves the console cursor to the given x/y coordinate
+* 0, 0 is the upper-left hand coordinate. Standard consoles are 80x24.
+* @param x
+* @param y
+*/
 void moveCursor(int x, int y)
 {
-    COORD c = { x,y };
-    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+	COORD c = { x,y };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
 }
 
 struct Vec2
 {
-    short x, y;
-    Vec2() : x(0), y(0) { }
-    Vec2(int x, int y) : x(x), y(y) { }
-    void operator +=(Vec2 v)
-    {
-        x += v.x;
-        y += v.y;
-    }
+	short x, y;
+	Vec2() : x(0), y(0) { }
+	Vec2(int x, int y) : x(x), y(y) { }
+	void operator +=(Vec2 v)
+	{
+		x += v.x;
+		y += v.y;
+	}
 };
 
 int randomValue(int min, int max)
 {
-    if (max - min > 0) return min;
-    return min + (rand() % (max - min + 1));
+	if (max - min < 0) return min;
+	int result = min + (rand() % (max - min + 1));
+	return result;
 }
 
 class Rect
 {
-    Vec2 min, max;
+	Vec2 min, max;
 public:
-    Rect(int minx, int miny, int maxx, int maxy)
-    :min(minx, miny), max(maxx, maxy)
-    {}
-    Rect() {}
-    void draw(const char letter) const
-    {
-        for (int row = min.y; row < max.y; row++)
-        {
-            for (int col = min.x; col < max.x; col++)
-            {
-                if (row >= 0 && col >= 0)
-                {
-                    moveCursor(col, row);
-                    putchar(letter);
-                }
-            }
-        }
-    }
-    bool isOverlapping(Rect const & r) const
-    {
-        return !(min.x >= r.max.x || max.x <= r.min.x
-                 || min.y >= r.max.y || max.y <= r.min.y);
-    }
-    void translate(Vec2 const & delta)
-    {
-        min += (delta);
-        max += (delta);
-    }
-    void setMin(Vec2 const & min) { this->min = min; }
-    Vec2 getMin() { return this->min; }
-    void setMax(Vec2 const & max) { this->max = max; }
-    Vec2 getMax() { return this->max; }
-    
-    static void setRandom(Rect & r)
-    {
-        int ranX, ranY, w, h;
-        ranX = randomValue(0, 50);
-        ranY = randomValue(0, 20);
-        
-        w = randomValue(2, 10);
-        h = randomValue(2, 10);
-        
-        r.min.x = ranX;
-        r.min.y = ranY;
-        r.max.x = w;
-        r.max.y = h;
-    }
-    static void setRandomByPointer(Rect * r)
-    {
-        int ranX, ranY, w, h;
-        ranX = randomValue(0, 50);
-        ranY = randomValue(0, 20);
-        
-        w = randomValue(2, 10);
-        h = randomValue(2, 10);
-        
-        r->min.x = ranX;
-        r->min.y = ranY;
-        r->max.x = w;
-        r->max.y = h;
-    }
-    std::string specs()
-    {
-        std::sstream result;
-        int width = ((this->max.x) - (this->min.x));
-        int heigth = ((this->max.y) - (this->min.y));
-        result << "The width is "
-               << width
-               << " the height is "
-               << height
-               << "\n";
-        return result.str();
-    }
+	Rect(int minx, int miny, int maxx, int maxy)
+		:min(minx, miny), max(maxx, maxy)
+	{}
+	Rect() {}
+	void draw(const char letter) const
+	{
+		for (int row = min.y; row < max.y; row++)
+		{
+			for (int col = min.x; col < max.x; col++)
+			{
+				if (row >= 0 && col >= 0)
+				{
+					moveCursor(col, row);
+					putchar(letter);
+				}
+			}
+		}
+	}
+	bool isOverlapping(Rect const & r) const
+	{
+		return !(min.x >= r.max.x || max.x <= r.min.x
+			|| min.y >= r.max.y || max.y <= r.min.y);
+	}
+	void translate(Vec2 const & delta)
+	{
+		min += (delta);
+		max += (delta);
+	}
+	void setMin(Vec2 const & min) { this->min = min; }
+	Vec2 getMin() { return this->min; }
+	void setMax(Vec2 const & max) { this->max = max; }
+	Vec2 getMax() { return this->max; }
+
+	static void setRandom(Rect & r)
+	{
+		int ranX, ranY, w, h;
+		ranX = randomValue(0, 50);
+		ranY = randomValue(0, 20);
+
+		w = randomValue(2, 10);
+		h = randomValue(2, 10);
+
+		r.min.x = ranX;
+		r.min.y = ranY;
+		r.max.x = ranX + w;
+		r.max.y = ranY + h;
+	}
+	static void setRandomByPointer(Rect * r)
+	{
+		int ranX, ranY, w, h;
+		ranX = randomValue(6, 50);
+		ranY = randomValue(6, 20);
+
+		w = randomValue(2, 10);
+		h = randomValue(2, 10);
+
+		r->min.x = ranX;
+		r->min.y = ranY;
+		r->max.x = ranX + w;
+		r->max.y = ranY + h;
+	}
+	std::string specs()
+	{
+		std::stringstream result;
+		int width = ((this->max.x) - (this->min.x));
+		int heigth = ((this->max.y) - (this->min.y));
+		result << " With ="
+			<< width
+			<< " Height ="
+			<< heigth
+			<< "\n";
+		return result.str();
+	}
 };
 
 /*_________________________________________________________________________________*/
 
 Rect* testOverlapping(Rect& srcRect, Rect& dstRect)
 {
-    Rect* rectPtr = NULL;
-    if (srcRect.isOverlapping(dstRect))
-    {
-        rectPtr = &dstRect;
-    }
-    return rectPtr;
+	Rect* rectPtr = NULL;
+	if (srcRect.isOverlapping(dstRect))
+	{
+		rectPtr = &dstRect;
+	}
+	return rectPtr;
 }
 
 #define NUMBER_OF_RECTS 5
 
 int main()
 {
-    srand(time(NULL));   // should only be called once
-    // initialization
-    Rect* userRect = new Rect(7, 5, 10, 9);
-    /** Creating random rects **/
-    Rect rect[NUMBER_OF_RECTS]{};
-    for (int i = 0; i < NUMBER_OF_RECTS; ++i)
-    {
-        Rect* r = new Rect();
-        Rect::setRandomByPointer(r);
-        rect[i] = *r;
-    }
+	srand(time(NULL));   // should only be called once
+						 // initialization
+	Rect* userRect = new Rect(7, 5, 10, 9);
+	/** Creating random rects **/
+	Rect rect[NUMBER_OF_RECTS]{};
+	for (int i = 0; i < NUMBER_OF_RECTS; ++i)
+	{
+		Rect* r = new Rect();
+		Rect::setRandomByPointer(r);
+		rect[i] = *r;
+	}
 
-    /**
-    Rect rect0(1, 6, 5, 15);
-    Rect rect1(1, 6, 5, 15);
-    Rect::setRandom(rect0);
-    Rect::setRandomByPointer(&rect1);
-    **/
-    int userInput;
-    
-    /*Game loop*/
-    do
-    {
-        moveCursor(0, 0);	// re-print instructions
-        printf("move with 'w', 'a', 's', and 'd'");
-        bool collision = false;
-        for (int i = 0; i < NUMBER_OF_RECTS; ++i)
-        {
-            rect[i].draw('0' + i);
-            Rect* rectCollidedPtr = testOverlapping(*userRect, rect[i]);
-            if (rectCollidedPtr != NULL)
-            {
-                collision = true;
-                std::cout << "The address of the rectangle that you've collided with is " << rectCollidedPtr;
-                std::cout << rectCollidedPtr->specs()
-            }
-        }
-        if (!collision)
-        {
-            userRect->draw('#');
-            std::cout << "no collision\n";
-        }
-        else
-        {
-            userRect->draw('+');
-        }
-        // user input
-        userInput = _getch();
-        // update
-        Vec2 move;
-        
-        switch (userInput)
-        {
-            case 'w':	move = Vec2(0, -1);	break;
-            case 'a':	move = Vec2(-1, 0);	break;
-            case 's':	move = Vec2(0, +1);	break;
-            case 'd':	move = Vec2(+1, 0);	break;
-        }
-        userRect->draw(' ');	// un-draw before moving
-        userRect->translate(move);
-    } while (userInput != 27); // escape key
-    
-    delete userRect;
-    for (int i = 0; i < NUMBER_OF_RECTS; ++i)
-    {
-        delete &rect[i];
-    }
-    return 0;
+	/**
+	Rect rect0(1, 6, 5, 15);
+	Rect rect1(1, 6, 5, 15);
+	Rect::setRandom(rect0);
+	Rect::setRandomByPointer(&rect1);
+	**/
+	int userInput;
+
+	/*Game loop*/
+	do
+	{
+		moveCursor(0, 0);	// re-print instructions
+		printf("move with 'w', 'a', 's', and 'd'");
+		bool collision = false;
+		int textRow = 0;
+		for (int i = 0; i < NUMBER_OF_RECTS; ++i)
+		{
+			rect[i].draw('0' + i);
+			Rect* rectCollidedPtr = testOverlapping(*userRect, rect[i]);
+			if (rectCollidedPtr != NULL)
+			{
+				collision = true;
+				moveCursor(0, ++textRow);
+				std::cout << "Rect Addr " << rectCollidedPtr;
+				std::cout << rectCollidedPtr->specs();
+			}
+		}
+		if (!collision)
+		{
+			userRect->draw('#');
+			moveCursor(0, 1);
+			std::cout << "no collision\n";
+			moveCursor(12, 1);
+			for (int i = 0; i < 200; ++i) std::cout << " ";
+		}
+		else
+		{
+			userRect->draw('+');
+		}
+		// user input
+		userInput = _getch();
+		// update
+		Vec2 move;
+
+		switch (userInput)
+		{
+		case 'w':	move = Vec2(0, -1);	break;
+		case 'a':	move = Vec2(-1, 0);	break;
+		case 's':	move = Vec2(0, +1);	break;
+		case 'd':	move = Vec2(+1, 0);	break;
+		}
+		userRect->draw(' ');	// un-draw before moving
+		userRect->translate(move);
+	} while (userInput != 27); // escape key
+
+	delete userRect;
+	for (int i = 0; i < NUMBER_OF_RECTS; ++i)
+	{
+		delete &rect[i];
+	}
+	return 0;
 }
 
 // INSTRUCTIONS
